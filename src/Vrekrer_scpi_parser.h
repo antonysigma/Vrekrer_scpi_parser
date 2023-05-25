@@ -40,6 +40,7 @@ Header file.
 #endif
 
 #include "Arduino.h"
+#include "function_objects.h"
 
 /*!
  Variable size string array class.
@@ -104,9 +105,9 @@ using SCPI_C = SCPI_Commands;
 using SCPI_P = SCPI_Parameters;
 
 ///Void template used with SCPI_Parser::RegisterCommand.
-using SCPI_caller_t = void(*)(SCPI_Commands, SCPI_Parameters, Stream&);
+using SCPI_caller_t = nostd::FunctionObject<void(const SCPI_Commands&, const SCPI_Parameters&, Stream&)>;
 ///Void template used with SCPI_Parser::RegisterSpecialCommand.
-using SCPI_special_caller_t = void(*)(SCPI_Commands, Stream&);
+using SCPI_special_caller_t = void(*)(const SCPI_Commands&, Stream&);
 
 /// Integer size used for hashes.
 using scpi_hash_t = SCPI_HASH_TYPE;

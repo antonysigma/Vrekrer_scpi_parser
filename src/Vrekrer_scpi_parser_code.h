@@ -16,7 +16,7 @@ void DefaultErrorHandler(SCPI_C c, SCPI_P p, Stream& interface) {}
   ``SCPI_Parser my_instrument``;
 */
 SCPI_Parser::SCPI_Parser(){
-  callers_[max_commands] = &DefaultErrorHandler;
+  callers_[max_commands] = DefaultErrorHandler;
 }
 
 ///Add a token to the tokens' storage
@@ -250,12 +250,12 @@ void SCPI_Parser::Execute(char* message, Stream &interface) {
     if (code == unknown_hash) {
       //Call ErrorHandler UnknownCommand
       last_error = ErrorCode::UnknownCommand;
-      (*callers_[max_commands])(commands, parameters, interface);
+      (callers_[max_commands])(commands, parameters, interface);
       continue;
     }
     for (uint8_t i = 0; i < codes_size_; i++)
       if (valid_codes_[i] == code) {
-        (*callers_[i])(commands, parameters, interface);
+        (callers_[i])(commands, parameters, interface);
         break;
       }  
   }
@@ -296,7 +296,7 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
     if (message_length_ >= buffer_length){
       //Call ErrorHandler due BufferOverflow
       last_error = ErrorCode::BufferOverflow;
-      (*callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
+      (callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
       message_length_ = 0;
       return NULL;
     }
@@ -341,7 +341,7 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
   if ((millis() - time_checker_) > timeout) {
       //Call ErrorHandler due Timeout
       last_error = ErrorCode::Timeout;
-      (*callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
+      (callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
       message_length_ = 0;
       return NULL;
   }
@@ -412,7 +412,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
           break;
         }
     interface.print(F("\t\t0x"));
-    interface.print(long(callers_[i]), HEX);
+    interface.print(long(callers_[i].memptr()), HEX);
     interface.println();
     interface.flush();
   }
